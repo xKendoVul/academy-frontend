@@ -4,7 +4,7 @@ steps:
       [
         "build",
         "-t",
-        "us-central1-docker.pkg.dev/microservices-academy/images-hadyi/fronted-academy",
+        "us-central1-docker.pkg.dev/microservices-academy/images-hadyi/frontend-academy",
         "-f",
         "Dockerfile.prod",
         "--platform=linux/amd64",
