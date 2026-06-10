@@ -4,11 +4,12 @@ FROM --platform=linux/amd64 node:20-alpine AS deps
 
 WORKDIR /usr/src/app
 
-COPY package.json package-lock.json ./
+COPY package.json ./
+COPY package-lock.json ./
 
-RUN npm ci
+RUN npm install --frozen-lockfile
 
-# 2. Build
+# 2. Build - Construir
 
 FROM --platform=linux/amd64 node:20-alpine AS build
 
@@ -17,6 +18,9 @@ WORKDIR /usr/src/app
 COPY --from=deps /usr/src/app/node_modules ./node_modules
 
 COPY . .
+
+ARG GATEWAY_URL
+ENV GATEWAY_URL=${GATEWAY_URL}
 
 RUN npm run build
 
@@ -27,17 +31,14 @@ FROM --platform=linux/amd64 node:20-alpine AS prod
 WORKDIR /usr/src/app
 
 ENV NODE_ENV=production
-ENV PORT=3004
+ENV NEXT_TELEMETRY_DISABLED=1
 
-# standalone genera server.js y solo lo necesario de node_modules
-COPY --from=build /usr/src/app/.next/standalone ./
-
-# standalone no incluye static por defecto, hay que copiarlo aparte
-COPY --from=build /usr/src/app/.next/static ./.next/static
-
-# copiar archivos públicos si existen
+# Copiar archivos necesarios para next start
 COPY --from=build /usr/src/app/public ./public
+COPY --from=build /usr/src/app/.next ./.next
+COPY --from=build /usr/src/app/node_modules ./node_modules
+COPY --from=build /usr/src/app/package.json ./package.json
 
 EXPOSE 3004
 
-CMD ["node", "server.js"]
+CMD ["npm", "run", "start"]
