@@ -30,6 +30,7 @@ export default function RootLayout({
             <a href="/" className="text-sm font-semibold text-neutral-800 hover:text-neutral-600">Academy</a>
             <a href="/estudiantes" className="text-sm text-neutral-500 hover:text-neutral-800">Estudiantes</a>
             <a href="/docentes" className="text-sm text-neutral-500 hover:text-neutral-800">Docentes</a>
+            <a href="/perfil" className="text-sm text-neutral-500 hover:text-neutral-800">Mi Perfil</a>
           </div>
         </nav>
         <main>{children}</main>
