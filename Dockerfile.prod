@@ -19,8 +19,8 @@ COPY --from=deps /usr/src/app/node_modules ./node_modules
 
 COPY . .
 
-ARG GATEWAY_URL
-ENV GATEWAY_URL=${GATEWAY_URL}
+ARG GATEWAY_URL=http://client-gateway:3000
+ENV NEXT_PUBLIC_GATEWAY_URL=${GATEWAY_URL}
 
 RUN npm run build
 
@@ -40,7 +40,5 @@ COPY --from=build /usr/src/app/node_modules ./node_modules
 COPY --from=build /usr/src/app/package.json ./package.json
 
 EXPOSE 3004
-
-ENV NEXT_PUBLIC_GATEWAY_URL=http://client-gateway:3000
 
 CMD ["npm", "run", "start"]
