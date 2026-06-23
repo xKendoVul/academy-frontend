@@ -7,7 +7,9 @@ import {
 } from "@/types/estudiante.interface";
 import type { FileRecord } from "@/types/estudiante.interface";
 
-const URL = `${process.env.NEXT_PUBLIC_GATEWAY_URL}`;
+// El navegador usa rutas relativas "/api/*" (mismo origen, puerto 80).
+// Next.js las reenvía al gateway via rewrites() en next.config.ts.
+const URL = "/api";
 
 export async function getAllStudents(): Promise<Estudiante[]> {
   const response = await fetch(`${URL}/estudiantes`, { cache: "no-store" });
