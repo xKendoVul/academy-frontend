@@ -34,18 +34,6 @@ export default function RootLayout({
             >
               Estudiantes
             </a>
-            <a
-              href="/docentes"
-              className="text-sm text-neutral-500 hover:text-neutral-800"
-            >
-              Docentes
-            </a>
-            <a
-              href="/perfil"
-              className="text-sm text-neutral-500 hover:text-neutral-800"
-            >
-              Mi Perfil
-            </a>
           </div>
         </nav>
         <main>{children}</main>
