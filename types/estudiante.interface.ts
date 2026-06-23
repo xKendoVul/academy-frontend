@@ -1,3 +1,16 @@
+export interface FileRecord {
+  id: number;
+  model_type: string;
+  model_id: number;
+  file_type: string;
+  original_name: string;
+  file_name: string;
+  file_path: string;
+  mime: string;
+  size: number;
+  created_at: string;
+}
+
 export interface Estudiante {
   id: number;
   etnia_id: number;

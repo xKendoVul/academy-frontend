@@ -1,74 +1,100 @@
-'use client'
+"use client";
 
-import { useEffect, useState, useRef } from 'react'
-import { getStudent, getDocente, getFilesByModel, uploadProfilePhoto, deleteProfilePhotoByModel, getFileUrl, FileRecord } from '@/actions'
+import { useEffect, useState, useRef } from "react";
+import {
+  getStudent,
+  getDocente,
+  getFilesByModel,
+  uploadProfilePhoto,
+  deleteProfilePhotoByModel,
+  getFileUrl,
+} from "@/actions";
+import type {
+  Estudiante,
+  Docente,
+  FileRecord,
+} from "@/types/estudiante.interface";
 
 export default function PerfilPage() {
-  const [modelType, setModelType] = useState<'estudiante' | 'docente'>('estudiante')
-  const [modelId, setModelId] = useState<number>(1)
-  const [user, setUser] = useState<any>(null)
-  const [files, setFiles] = useState<FileRecord[]>([])
-  const [loading, setLoading] = useState(false)
-  const [uploading, setUploading] = useState(false)
-  const [error, setError] = useState('')
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [modelType, setModelType] = useState<"estudiante" | "docente">(
+    "estudiante",
+  );
+  const [modelId, setModelId] = useState<number>(1);
+  const [user, setUser] = useState<Estudiante | Docente | null>(null);
+  const [files, setFiles] = useState<FileRecord[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    loadData()
-  }, [modelType, modelId])
+    loadData();
+  }, [modelType, modelId]);
 
   async function loadData() {
-    setLoading(true)
-    setError('')
+    setLoading(true);
+    setError("");
     try {
-      const userData = modelType === 'estudiante'
-        ? await getStudent(modelId)
-        : await getDocente(modelId)
-      setUser(userData)
+      const userData =
+        modelType === "estudiante"
+          ? await getStudent(modelId)
+          : await getDocente(modelId);
+      setUser(userData);
 
-      const photoFiles = await getFilesByModel(modelType, modelId, 'foto_perfil')
-      setFiles(photoFiles)
-    } catch (e: any) {
-      setError(e.message || 'Error al cargar datos')
-      setUser(null)
+      const photoFiles = await getFilesByModel(
+        modelType,
+        modelId,
+        "foto_perfil",
+      );
+      setFiles(photoFiles);
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : "Error al cargar datos";
+      setError(message);
+      setUser(null);
     }
-    setLoading(false)
+    setLoading(false);
   }
 
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (!file) return
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-    setUploading(true)
-    setError('')
+    setUploading(true);
+    setError("");
     try {
-      await deleteProfilePhotoByModel(modelType, modelId)
-      await uploadProfilePhoto(modelType, modelId, file, modelId)
-      await loadData()
-    } catch (err: any) {
-      setError(err.message || 'Error al subir archivo')
+      // Solo eliminar si ya existe una foto
+      if (currentPhoto) {
+        await deleteProfilePhotoByModel(modelType, modelId);
+      }
+      await uploadProfilePhoto(modelType, modelId, file, modelId);
+      await loadData();
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : "Error al subir archivo";
+      setError(message);
     }
-    setUploading(false)
-    if (fileInputRef.current) fileInputRef.current.value = ''
+    setUploading(false);
+    if (fileInputRef.current) fileInputRef.current.value = "";
   }
 
   async function handleDeletePhoto() {
-    if (!confirm('¿Eliminar la foto de perfil?')) return
-    setError('')
+    if (!confirm("¿Eliminar la foto de perfil?")) return;
+    setError("");
     try {
-      await deleteProfilePhotoByModel(modelType, modelId)
-      await loadData()
-    } catch (err: any) {
-      setError(err.message || 'Error al eliminar archivo')
+      await deleteProfilePhotoByModel(modelType, modelId);
+      await loadData();
+    } catch (e: unknown) {
+      const message =
+        e instanceof Error ? e.message : "Error al eliminar archivo";
+      setError(message);
     }
   }
 
-  const currentPhoto = files.find(f => f.file_type === 'foto_perfil')
+  const currentPhoto = files.find((f) => f.file_type === "foto_perfil");
   const displayName = user
-    ? modelType === 'estudiante'
-      ? `${user.nombres} ${user.paterno}${user.materno ? ' ' + user.materno : ''}`
-      : `${user.nombres} ${user.apellidos}`
-    : ''
+    ? modelType === "estudiante"
+      ? `${(user as Estudiante).nombres} ${(user as Estudiante).paterno}${(user as Estudiante).materno ? " " + (user as Estudiante).materno : ""}`
+      : `${(user as Docente).nombres} ${(user as Docente).apellidos}`
+    : "";
 
   return (
     <div className="max-w-md mx-auto px-6 py-8">
@@ -78,7 +104,9 @@ export default function PerfilPage() {
         <select
           className="flex-1 border border-neutral-200 rounded-md px-3 py-2 text-sm bg-white"
           value={modelType}
-          onChange={e => setModelType(e.target.value as 'estudiante' | 'docente')}
+          onChange={(e) =>
+            setModelType(e.target.value as "estudiante" | "docente")
+          }
         >
           <option value="estudiante">Estudiante</option>
           <option value="docente">Docente</option>
@@ -88,7 +116,7 @@ export default function PerfilPage() {
           min={1}
           className="w-24 border border-neutral-200 rounded-md px-3 py-2 text-sm"
           value={modelId}
-          onChange={e => setModelId(Number(e.target.value))}
+          onChange={(e) => setModelId(Number(e.target.value))}
         />
         <button
           onClick={loadData}
@@ -130,12 +158,14 @@ export default function PerfilPage() {
               )}
             </div>
 
-            <h2 className="text-lg font-semibold text-neutral-800 mb-1">{displayName}</h2>
+            <h2 className="text-lg font-semibold text-neutral-800 mb-1">
+              {displayName}
+            </h2>
             <p className="text-sm text-neutral-500 capitalize">{modelType}</p>
 
             <div className="mt-6 flex gap-3">
               <label className="px-4 py-2 text-sm font-medium bg-neutral-800 text-white rounded-md hover:bg-neutral-700 cursor-pointer">
-                {currentPhoto ? 'Cambiar' : 'Subir'} foto
+                {currentPhoto ? "Cambiar" : "Subir"} foto
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -156,8 +186,10 @@ export default function PerfilPage() {
           </div>
         </div>
       ) : (
-        <div className="text-center py-10 text-neutral-400">Usuario no encontrado</div>
+        <div className="text-center py-10 text-neutral-400">
+          Usuario no encontrado
+        </div>
       )}
     </div>
-  )
+  );
 }
