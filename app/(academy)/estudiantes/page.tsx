@@ -40,14 +40,22 @@ export default function EstudiantesPage() {
 
   async function loadData() {
     setLoading(true);
-    const [ests, sx, et] = await Promise.all([
-      getAllStudents(),
-      getSexos(),
-      getEtnias(),
-    ]);
-    setEstudiantes(ests);
-    setSexos(sx);
-    setEtnias(et);
+    setError("");
+    try {
+      const [ests, sx, et] = await Promise.all([
+        getAllStudents(),
+        getSexos(),
+        getEtnias(),
+      ]);
+      setEstudiantes(ests);
+      setSexos(sx);
+      setEtnias(et);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Error al cargar datos");
+      setEstudiantes([]);
+      setSexos([]);
+      setEtnias([]);
+    }
     setLoading(false);
   }
 
