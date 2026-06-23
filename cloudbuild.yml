@@ -9,7 +9,7 @@ steps:
         "Dockerfile.prod",
         "--platform=linux/amd64",
         "--build-arg",
-        "GATEWAY_URL=http://client-gateway:3000",
+        "GATEWAY_URL=http://35.202.115.135:3000",
         ".",
       ]
   - name: "gcr.io/cloud-builders/docker"
